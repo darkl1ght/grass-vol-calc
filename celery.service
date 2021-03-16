@@ -1,0 +1,24 @@
+[Unit]
+Description=Celery Service
+After=network.target
+After=rabbitmq-server.service
+Requires=rabbitmq-server.service
+
+[Service]
+Type=forking
+User=celery
+Group=celery
+EnvironmentFile=-/etc/default/celery
+WorkingDirectory=-/home/mapboxuse/geoprocessing-api
+ExecStart=/bin/sh -c '${CELERY_BIN} -A $CELERY_APP multi start $CELERYD_NODES \
+	--pidfile=${CELERYD_PID_FILE} --logfile=${CELERYD_LOG_FILE} \
+	--loglevel="${CELERYD_LOG_LEVEL}" --concurrency=1 $CELERYD_OPTS'
+ExecStop=/bin/sh -c '${CELERY_BIN} multi stopwait $CELERYD_NODES \
+	--pidfile=${CELERYD_PID_FILE} --logfile=${CELERYD_LOG_FILE}'
+ExecReload=/bin/sh -c '${CELERY_BIN} -A $CELERY_APP multi restart $CELERYD_NODES \
+	--pidfile=${CELERYD_PID_FILE} --logfile=${CELERYD_LOG_FILE} \
+	--loglevel="${CELERYD_LOG_LEVEL}" --concurrency=1 $CELERYD_OPTS'
+
+
+[Install]
+WantedBy=multi-user.target
