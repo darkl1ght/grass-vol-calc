@@ -1,5 +1,5 @@
 [Unit]
-Description=Celery Service
+Description=Volume Calc Celery Service
 After=network.target
 After=rabbitmq-server.service
 Requires=rabbitmq-server.service
